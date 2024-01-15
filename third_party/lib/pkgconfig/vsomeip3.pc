@@ -1,0 +1,10 @@
+prefix=/home/shihaotian/third_party/vsomeip/build/output
+exec_prefix=/home/shihaotian/third_party/vsomeip/build/output
+libdir=/home/shihaotian/third_party/vsomeip/build/output/lib
+includedir=/home/shihaotian/third_party/vsomeip/build/output/include
+
+Name: vsomeip
+Description: New SOME/IP stack, feature complete
+Version: 3.4.10
+Libs: -L${libdir} -lvsomeip3
+Cflags: -I${includedir}
