@@ -18,8 +18,7 @@
  * @log
  */
 
-#ifndef CYBER_COMMON_LOG_H_
-#define CYBER_COMMON_LOG_H_
+#pragma once
 
 #include <cstdarg>
 #include <string>
@@ -27,13 +26,11 @@
 #include "glog/logging.h"
 #include "glog/raw_logging.h"
 
-#include "cyber/binary.h"
-
 #define LEFT_BRACKET "["
 #define RIGHT_BRACKET "]"
 
 #ifndef MODULE_NAME
-#define MODULE_NAME apollo::cyber::binary::GetName().c_str()
+#define MODULE_NAME "SM"
 #endif
 
 #define ADEBUG_MODULE(module) \
@@ -141,5 +138,3 @@
     return;                   \
   }
 #endif
-
-#endif  // CYBER_COMMON_LOG_H_

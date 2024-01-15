@@ -29,7 +29,7 @@
 
 #include "shared_library.h"
 #include "class_factory.h"
-// #include "cyber/common/log.h"
+#include "log.h"
 
 /**
  *  class register implement

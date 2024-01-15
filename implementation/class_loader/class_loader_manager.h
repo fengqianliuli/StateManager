@@ -14,8 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBER_CLASS_LOADER_CLASS_LOADER_MANAGER_H_
-#define CYBER_CLASS_LOADER_CLASS_LOADER_MANAGER_H_
+#pragma once
 
 #include <map>
 #include <memory>
@@ -23,10 +22,9 @@
 #include <string>
 #include <vector>
 
-#include "cyber/class_loader/class_loader.h"
+#include "class_loader.h"
 
-namespace apollo {
-namespace cyber {
+namespace sm {
 namespace class_loader {
 
 class ClassLoaderManager {
@@ -124,7 +122,4 @@ std::string ClassLoaderManager::GetClassValidLibrary(
 }
 
 }  // namespace class_loader
-}  // namespace cyber
-}  // namespace apollo
-
-#endif  // CYBER_CLASS_LOADER_CLASS_LOADER_MANAGER_H_
+}  // namespace sm

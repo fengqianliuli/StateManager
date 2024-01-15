@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef CYBER_CLASS_LOADER_CLASS_LOADER_H_
-#define CYBER_CLASS_LOADER_CLASS_LOADER_H_
+#pragma once
 
 #include <algorithm>
 #include <functional>
@@ -23,10 +22,9 @@
 #include <string>
 #include <vector>
 
-#include "cyber/class_loader/class_loader_register_macro.h"
+#include "class_loader_register_macro.h"
 
-namespace apollo {
-namespace cyber {
+namespace sm {
 namespace class_loader {
 
 /**
@@ -106,6 +104,4 @@ void ClassLoader::OnClassObjDeleter(Base* obj) {
 }
 
 }  // namespace class_loader
-}  // namespace cyber
-}  // namespace apollo
-#endif  // CYBER_CLASS_LOADER_CLASS_LOADER_H_
+}  // namespace sm

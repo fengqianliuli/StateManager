@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "cyber/class_loader/class_loader.h"
+#include "class_loader.h"
 
-namespace apollo {
-namespace cyber {
+namespace sm {
 namespace class_loader {
 ClassLoader::ClassLoader(const std::string& library_path)
     : library_path_(library_path),
@@ -62,5 +61,4 @@ int ClassLoader::UnloadLibrary() {
 const std::string ClassLoader::GetLibraryPath() const { return library_path_; }
 
 }  // namespace class_loader
-}  // namespace cyber
-}  // namespace apollo
+}  // namespace sm

@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "cyber/class_loader/class_loader_manager.h"
+#include "class_loader_manager.h"
 
-namespace apollo {
-namespace cyber {
+namespace sm {
 namespace class_loader {
 
 ClassLoaderManager::ClassLoaderManager() {}
@@ -81,5 +80,4 @@ void ClassLoaderManager::UnloadAllLibrary() {
   }
 }
 }  // namespace class_loader
-}  // namespace cyber
-}  // namespace apollo
+}  // namespace sm

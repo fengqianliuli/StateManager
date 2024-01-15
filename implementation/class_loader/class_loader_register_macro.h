@@ -14,10 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBER_CLASS_LOADER_CLASS_LOADER_REGISTER_MACRO_H_
-#define CYBER_CLASS_LOADER_CLASS_LOADER_REGISTER_MACRO_H_
+#pragma once
 
-#include "cyber/class_loader/utility/class_loader_utility.h"
+#include "class_loader_utility.h"
 
 #define CLASS_LOADER_REGISTER_CLASS_INTERNAL(Derived, Base, UniqueID)     \
   namespace {                                                             \
@@ -36,5 +35,3 @@
 // register class macro
 #define CLASS_LOADER_REGISTER_CLASS(Derived, Base) \
   CLASS_LOADER_REGISTER_CLASS_INTERNAL_1(Derived, Base, __COUNTER__)
-
-#endif  // CYBER_CLASS_LOADER_CLASS_LOADER_REGISTER_MACRO_H_

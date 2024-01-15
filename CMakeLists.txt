@@ -16,6 +16,7 @@ set(USE_RT "rt")
 set(DL_LIBRARY "dl")
 set(PTHREAD_LIBRARY "pthread")
 
+set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/third_party")
 find_package(glog REQUIRED)
 
 add_subdirectory(implementation)
