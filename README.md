@@ -2,7 +2,7 @@
 
 deps:
 - header only
-  - fsmlite master https://github.com/fengqianliuli/fsmlite
+  - fsm master https://github.com/fengqianliuli/fsm
   - nlohmann/json v3.11.3 https://json.nlohmann.me/
 
 - dylib

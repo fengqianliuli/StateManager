@@ -33,3 +33,5 @@
 
 # build temp file
 build/
+
+.vscode/

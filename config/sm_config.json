@@ -1,0 +1,31 @@
+{
+    "states": [
+        "normal",
+        "ota",
+        "calibration",
+        "stop"
+    ],
+    "initial_state": "normal",
+    "transitions": [
+        {
+            "trigger": "start",
+            "source": "normal",
+            "dest": "ota"
+        },
+        {
+            "trigger": "start",
+            "source": "ota",
+            "dest": "calibration"
+        },
+        {
+            "trigger": "start",
+            "source": "calibration",
+            "dest": "stop"
+        },
+        {
+            "trigger": "stop",
+            "source": "stop",
+            "dest": "normal"
+        }
+    ]
+}
