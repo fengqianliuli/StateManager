@@ -24,6 +24,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <fstream>
 
 #include <nlohmann/json.hpp>
 
@@ -39,8 +40,9 @@ PluginManager::~PluginManager() {}
 
 bool PluginManager::ProcessPluginDescriptionFile(const std::string& file_path,
                                                  std::string* library_path) {
-  nlohmann::json root = nlohmann::json::parse(file_path,
-                                              nullptr, true, true);
+  std::ifstream file(file_path, std::ios::in);
+  nlohmann::json root = nlohmann::json::parse(file, nullptr, true, true);
+  file.close();
   if (root.is_discarded()) {
     AWARN << "fail to process file " << file_path;
     return false;

@@ -12,6 +12,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror")
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_C_STANDARD 99)
 
+set(CMAKE_INSTALL_PREFIX "./install")
+set(CONFIG_DIR "${CMAKE_SOURCE_DIR}/config")
+
 set(USE_RT "rt")
 set(DL_LIBRARY "dl")
 set(PTHREAD_LIBRARY "pthread")

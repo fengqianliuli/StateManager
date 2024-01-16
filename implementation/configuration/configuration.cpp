@@ -1,5 +1,7 @@
 #include "configuration/configuration.h"
 
+#include <fstream>
+
 #include "common/log.h"
 
 namespace sm {
@@ -8,7 +10,9 @@ namespace config {
 Configuration::Configuration() {}
 
 bool Configuration::Init(const std::string& path) {
-  nlohmann::json root = nlohmann::json::parse(path, nullptr, true, true);
+  std::ifstream file(path, std::ios::in);
+  nlohmann::json root = nlohmann::json::parse(file, nullptr, true, true);
+  file.close();
   if (root.is_discarded()) {
     AWARN << "state config [" << path << "] invalid, parse file failed";
     return false;

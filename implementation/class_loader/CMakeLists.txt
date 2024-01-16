@@ -13,3 +13,4 @@ add_library(class_loader_manager SHARED ${class_loader_manager_SRC})
 set_target_properties (class_loader_manager PROPERTIES VERSION ${SM_VERSION} SOVERSION ${SM_MAJOR_VERSION})
 
 target_link_libraries(class_loader_manager class_loader_utility shared_library common_header)
+install(TARGETS class_loader_manager LIBRARY DESTINATION lib)

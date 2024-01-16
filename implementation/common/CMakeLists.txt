@@ -18,3 +18,4 @@ add_library(common SHARED ${common_SRC})
 set_target_properties (common PROPERTIES VERSION ${SM_VERSION} SOVERSION ${SM_MAJOR_VERSION})
 
 target_link_libraries(common common_header)
+install(TARGETS common LIBRARY DESTINATION lib)

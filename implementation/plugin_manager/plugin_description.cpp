@@ -20,6 +20,7 @@
 #include <regex>
 #include <string>
 #include <utility>
+#include <fstream>
 
 #include <nlohmann/json.hpp>
 
@@ -73,8 +74,9 @@ bool PluginDescription::ParseFromDescriptionFile(const std::string& file_path) {
     return false;
   }
 
-  nlohmann::json root = nlohmann::json::parse(this->actual_description_path_,
-                                              nullptr, true, true);
+  std::ifstream file(this->actual_description_path_, std::ios::in);
+  nlohmann::json root = nlohmann::json::parse(file, nullptr, true, true);
+  file.close();
   if (root.is_discarded()) {
     AWARN << "plugin description[" << file_path << "] name[" << this->name_
           << "] invalid, parse description file failed";
