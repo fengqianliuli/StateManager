@@ -14,16 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBER_COMMON_ENVIRONMENT_H_
-#define CYBER_COMMON_ENVIRONMENT_H_
+#pragma once
 
 #include <cassert>
 #include <string>
 
-#include "cyber/common/log.h"
+#include "common/log.h"
 
-namespace apollo {
-namespace cyber {
+namespace sm {
 namespace common {
 
 inline std::string GetEnv(const std::string& var_name,
@@ -38,15 +36,12 @@ inline std::string GetEnv(const std::string& var_name,
 }
 
 inline const std::string WorkRoot() {
-  std::string work_root = GetEnv("CYBER_PATH");
+  std::string work_root = GetEnv("SM_PATH");
   if (work_root.empty()) {
-    work_root = "/apollo/cyber";
+    work_root = "/state_manager";
   }
   return work_root;
 }
 
 }  // namespace common
-}  // namespace cyber
-}  // namespace apollo
-
-#endif  // CYBER_COMMON_ENVIRONMENT_H_
+}  // namespace sm

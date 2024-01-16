@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "class_loader_manager.h"
+#include "class_loader/class_loader_manager.h"
 
 namespace sm {
 namespace class_loader {

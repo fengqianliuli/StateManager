@@ -14,8 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBER_COMMON_MACROS_H_
-#define CYBER_COMMON_MACROS_H_
+#pragma once
 
 #include <iostream>
 #include <memory>
@@ -23,7 +22,23 @@
 #include <type_traits>
 #include <utility>
 
-#include "cyber/base/macros.h"
+#define DEFINE_TYPE_TRAIT(name, func)                     \
+  template <typename T>                                   \
+  struct name {                                           \
+    template <typename Class>                             \
+    static constexpr bool Test(decltype(&Class::func)*) { \
+      return true;                                        \
+    }                                                     \
+    template <typename>                                   \
+    static constexpr bool Test(...) {                     \
+      return false;                                       \
+    }                                                     \
+                                                          \
+    static constexpr bool value = Test<T>(nullptr);       \
+  };                                                      \
+                                                          \
+  template <typename T>                                   \
+  constexpr bool name<T>::value;
 
 DEFINE_TYPE_TRAIT(HasShutdown, Shutdown)
 
@@ -71,5 +86,3 @@ typename std::enable_if<!HasShutdown<T>::value>::type CallShutdown(
  private:                                                                 \
   classname();                                                            \
   DISALLOW_COPY_AND_ASSIGN(classname)
-
-#endif  // CYBER_COMMON_MACROS_H_

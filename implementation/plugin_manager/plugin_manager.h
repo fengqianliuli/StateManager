@@ -23,15 +23,14 @@
 
 #include <cxxabi.h>
 
-#include "cyber/class_loader/class_loader_manager.h"
-#include "cyber/common/environment.h"
-#include "cyber/common/file.h"
-#include "cyber/common/log.h"
-#include "cyber/common/macros.h"
-#include "cyber/plugin_manager/plugin_description.h"
+#include "class_loader/class_loader_manager.h"
+#include "common/environment.h"
+#include "common/file.h"
+#include "common/log.h"
+#include "common/macros.h"
+#include "plugin_manager/plugin_description.h"
 
-namespace apollo {
-namespace cyber {
+namespace sm {
 namespace plugin_manager {
 
 class PluginManager {
@@ -136,7 +135,7 @@ class PluginManager {
   std::vector<std::string> GetDerivedClassNameByBaseClass();
 
  private:
-  apollo::cyber::class_loader::ClassLoaderManager class_loader_manager_;
+  sm::class_loader::ClassLoaderManager class_loader_manager_;
   std::map<std::string, std::shared_ptr<PluginDescription>>
       plugin_description_map_;
   std::map<std::string, bool> plugin_loaded_map_;
@@ -176,7 +175,7 @@ std::string PluginManager::GetPluginClassHomePath(
       // TODO(liangjinping): remove hard code of relative prefix
       std::string relative_prefix = "share/";
       std::string relative_plugin_home_path =
-          apollo::cyber::common::GetDirName(it->second->description_path_);
+          sm::common::GetDirName(it->second->description_path_);
       if (relative_plugin_home_path.rfind(relative_prefix, 0) == 0) {
         relative_plugin_home_path =
             relative_plugin_home_path.substr(relative_prefix.size());
@@ -192,7 +191,7 @@ template <typename Base>
 std::string PluginManager::GetPluginConfPath(const std::string& class_name,
                                              const std::string& conf_name) {
   std::string plugin_home_path = GetPluginClassHomePath<Base>(class_name);
-  if (apollo::cyber::common::PathIsAbsolute(plugin_home_path)) {
+  if (sm::common::PathIsAbsolute(plugin_home_path)) {
     // can not detect the plugin relative path
     AWARN << "plugin of class " << class_name << " load from absolute path, "
           << "conf path will be relative to it's description file";
@@ -200,8 +199,8 @@ std::string PluginManager::GetPluginConfPath(const std::string& class_name,
 
   std::string relative_conf_path = plugin_home_path + "/" + conf_name;
   std::string actual_conf_path;
-  if (apollo::cyber::common::GetFilePathWithEnv(
-          relative_conf_path, "APOLLO_CONF_PATH", &actual_conf_path)) {
+  if (sm::common::GetFilePathWithEnv(
+          relative_conf_path, "SM_CONF_PATH", &actual_conf_path)) {
     return actual_conf_path;
   }
   return plugin_home_path + "/" + conf_name;
@@ -269,9 +268,8 @@ std::vector<std::string> PluginManager::GetDerivedClassNameByBaseClass() {
   return derived_class_name;
 }
 
-#define CYBER_PLUGIN_MANAGER_REGISTER_PLUGIN(name, base) \
+#define SM_PLUGIN_MANAGER_REGISTER_PLUGIN(name, base) \
   CLASS_LOADER_REGISTER_CLASS(name, base)
 
 }  // namespace plugin_manager
-}  // namespace cyber
-}  // namespace apollo
+}  // namespace sm

@@ -22,7 +22,7 @@
 #include <string>
 #include <vector>
 
-#include "class_loader.h"
+#include "class_loader/class_loader.h"
 
 namespace sm {
 namespace class_loader {

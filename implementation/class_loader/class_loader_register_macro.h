@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "class_loader_utility.h"
+#include "class_loader/utility/class_loader_utility.h"
 
 #define CLASS_LOADER_REGISTER_CLASS_INTERNAL(Derived, Base, UniqueID)     \
   namespace {                                                             \

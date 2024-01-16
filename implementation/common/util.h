@@ -14,14 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBER_COMMON_UTIL_H_
-#define CYBER_COMMON_UTIL_H_
+#pragma once
 
 #include <string>
 #include <type_traits>
 
-namespace apollo {
-namespace cyber {
+namespace sm {
 namespace common {
 
 inline std::size_t Hash(const std::string& key) {
@@ -34,7 +32,4 @@ auto ToInt(Enum const value) -> typename std::underlying_type<Enum>::type {
 }
 
 }  // namespace common
-}  // namespace cyber
-}  // namespace apollo
-
-#endif  // CYBER_COMMON_UTIL_H_
+}  // namespace sm

@@ -14,13 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBER_COMMON_TYPES_H_
-#define CYBER_COMMON_TYPES_H_
+#pragma once
 
 #include <cstdint>
 
-namespace apollo {
-namespace cyber {
+namespace sm {
 
 class NullType {};
 
@@ -43,7 +41,4 @@ enum Relation : std::uint8_t {
 static const char SRV_CHANNEL_REQ_SUFFIX[] = "__SRV__REQUEST";
 static const char SRV_CHANNEL_RES_SUFFIX[] = "__SRV__RESPONSE";
 
-}  // namespace cyber
-}  // namespace apollo
-
-#endif  // CYBER_COMMON_TYPES_H_
+}  // namespace sm

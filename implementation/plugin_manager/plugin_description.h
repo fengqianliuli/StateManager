@@ -17,8 +17,7 @@
 #include <map>
 #include <string>
 
-namespace apollo {
-namespace cyber {
+namespace sm {
 namespace plugin_manager {
 
 // plugin description struct
@@ -60,5 +59,4 @@ class PluginDescription {
 };
 
 }  // namespace plugin_manager
-}  // namespace cyber
-}  // namespace apollo
+}  // namespace sm

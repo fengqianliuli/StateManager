@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "class_factory.h"
+#include "class_loader/utility/class_factory.h"
 
 #include <algorithm>
 

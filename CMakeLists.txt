@@ -18,6 +18,7 @@ set(PTHREAD_LIBRARY "pthread")
 
 set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/third_party")
 find_package(glog REQUIRED)
+find_package(nlohmann_json REQUIRED)
 
 add_subdirectory(implementation)
 

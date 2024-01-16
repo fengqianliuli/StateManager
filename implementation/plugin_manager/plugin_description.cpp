@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "cyber/plugin_manager/plugin_description.h"
+#include "plugin_manager/plugin_description.h"
 
 #include <map>
 #include <memory>
@@ -21,14 +21,13 @@
 #include <string>
 #include <utility>
 
-#include <tinyxml2.h>
+#include <nlohmann/json.hpp>
 
-#include "cyber/common/environment.h"
-#include "cyber/common/file.h"
-#include "cyber/common/log.h"
+#include "common/environment.h"
+#include "common/file.h"
+#include "common/log.h"
 
-namespace apollo {
-namespace cyber {
+namespace sm {
 namespace plugin_manager {
 
 PluginDescription::PluginDescription() {}
@@ -50,9 +49,9 @@ PluginDescription::PluginDescription(const std::string& name,
 
 bool PluginDescription::ParseFromIndexFile(const std::string& file_path) {
   this->description_index_path_ = file_path;
-  this->name_ = apollo::cyber::common::GetFileName(file_path);
+  this->name_ = sm::common::GetFileName(file_path);
 
-  if (!apollo::cyber::common::GetContent(file_path, &this->description_path_)) {
+  if (!sm::common::GetContent(file_path, &this->description_path_)) {
     AWARN << "plugin index[" << file_path << "] name[" << this->name_
           << "] invalid, read index file failed";
     return false;
@@ -65,8 +64,8 @@ bool PluginDescription::ParseFromDescriptionFile(const std::string& file_path) {
     this->description_path_ = file_path;
   }
 
-  if (!apollo::cyber::common::GetFilePathWithEnv(
-          this->description_path_, "APOLLO_PLUGIN_DESCRIPTION_PATH",
+  if (!sm::common::GetFilePathWithEnv(
+          this->description_path_, "SM_PLUGIN_DESCRIPTION_PATH",
           &this->actual_description_path_)) {
     AWARN << "plugin index[" << file_path << "] name[" << this->name_
           << "] invalid, description[" << this->description_path_
@@ -74,15 +73,15 @@ bool PluginDescription::ParseFromDescriptionFile(const std::string& file_path) {
     return false;
   }
 
-  tinyxml2::XMLDocument doc;
-  if (doc.LoadFile(this->actual_description_path_.c_str()) !=
-      tinyxml2::XML_SUCCESS) {
+  nlohmann::json root = nlohmann::json::parse(this->actual_description_path_,
+                                              nullptr, true, true);
+  if (root.is_discarded()) {
     AWARN << "plugin description[" << file_path << "] name[" << this->name_
           << "] invalid, parse description file failed";
     return false;
   }
-  const tinyxml2::XMLElement* root = doc.RootElement();
-  this->library_path_ = root->Attribute("path");
+
+  this->library_path_ = root["path"];
 
   std::string plugin_name =
       std::regex_replace(this->library_path_, std::regex("/"), "__");
@@ -91,13 +90,10 @@ bool PluginDescription::ParseFromDescriptionFile(const std::string& file_path) {
   }
 
   // process class name and base class name from description file, this will be
-  // used to build index fo lazy load
-  for (const tinyxml2::XMLElement* class_element =
-           root->FirstChildElement("class");
-       class_element != nullptr;
-       class_element = class_element->NextSiblingElement("class")) {
-    std::string class_name = class_element->Attribute("type");
-    std::string base_class_name = class_element->Attribute("base_class");
+  // used to build index for lazy load
+  for (const auto& class_element : root["class"]) {
+    std::string class_name = class_element["type"];
+    std::string base_class_name = class_element["base_class"];
 
     if (this->class_name_base_class_name_map_.find(class_name) !=
         this->class_name_base_class_name_map_.end()) {
@@ -115,8 +111,8 @@ bool PluginDescription::ParseFromDescriptionFile(const std::string& file_path) {
     this->class_name_base_class_name_map_[class_name] = base_class_name;
   }
 
-  if (!apollo::cyber::common::GetFilePathWithEnv(this->library_path_,
-                                                 "APOLLO_PLUGIN_LIB_PATH",
+  if (!sm::common::GetFilePathWithEnv(this->library_path_,
+                                                 "SM_PLUGIN_LIB_PATH",
                                                  &this->actual_library_path_)) {
     AWARN << "plugin description[" << file_path << "] name[" << this->name_
           << "] invalid, library[" << this->library_path_ << "] file not found";
@@ -127,5 +123,4 @@ bool PluginDescription::ParseFromDescriptionFile(const std::string& file_path) {
 }
 
 }  // namespace plugin_manager
-}  // namespace cyber
-}  // namespace apollo
+}  // namespace sm

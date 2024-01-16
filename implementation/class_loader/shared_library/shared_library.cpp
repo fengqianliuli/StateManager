@@ -21,7 +21,7 @@
 //
 // SPDX-License-Identifier: BSL-1.0
 //
-#include "shared_library.h"
+#include "class_loader/shared_library/shared_library.h"
 
 #include <dlfcn.h>
 

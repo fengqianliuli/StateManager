@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "class_loader_utility.h"
+#include "class_loader/utility/class_loader_utility.h"
 
 namespace sm {
 namespace class_loader {

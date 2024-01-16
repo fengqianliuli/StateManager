@@ -29,7 +29,7 @@
 #include <mutex>
 #include <string>
 
-#include "exceptions.h"
+#include "class_loader/shared_library/exceptions.h"
 
 namespace sm {
 namespace class_loader {

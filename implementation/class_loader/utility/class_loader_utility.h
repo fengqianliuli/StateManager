@@ -27,9 +27,9 @@
 #include <utility>
 #include <vector>
 
-#include "shared_library.h"
-#include "class_factory.h"
-#include "log.h"
+#include "class_loader/shared_library/shared_library.h"
+#include "class_loader/utility/class_factory.h"
+#include "common/log.h"
 
 /**
  *  class register implement

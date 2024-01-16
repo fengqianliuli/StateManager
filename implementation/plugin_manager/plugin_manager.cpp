@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/plugin_manager/plugin_manager.h"
+#include "plugin_manager/plugin_manager.h"
 
 #include <dirent.h>
 #include <unistd.h>
@@ -25,30 +25,29 @@
 #include <utility>
 #include <vector>
 
-#include <tinyxml2.h>
+#include <nlohmann/json.hpp>
 
-#include "cyber/common/environment.h"
-#include "cyber/common/file.h"
-#include "cyber/common/log.h"
-#include "cyber/plugin_manager/plugin_description.h"
+#include "common/environment.h"
+#include "common/file.h"
+#include "common/log.h"
+#include "plugin_manager/plugin_description.h"
 
-namespace apollo {
-namespace cyber {
+namespace sm {
 namespace plugin_manager {
 
 PluginManager::~PluginManager() {}
 
 bool PluginManager::ProcessPluginDescriptionFile(const std::string& file_path,
                                                  std::string* library_path) {
-  tinyxml2::XMLDocument doc;
-  if (doc.LoadFile(file_path.c_str()) != tinyxml2::XML_SUCCESS) {
+  nlohmann::json root = nlohmann::json::parse(file_path,
+                                              nullptr, true, true);
+  if (root.is_discarded()) {
     AWARN << "fail to process file " << file_path;
     return false;
   }
-  const tinyxml2::XMLElement* root = doc.RootElement();
 
   // TODO(liangjinping): parse as struct
-  *library_path = root->Attribute("path");
+  *library_path = root["path"];
 
   // TODO(liangjinping): parse description file and do something more
 
@@ -61,7 +60,7 @@ bool PluginManager::LoadPlugin(
         << "]";
 
   auto description =
-      std::make_shared<apollo::cyber::plugin_manager::PluginDescription>();
+      std::make_shared<sm::plugin_manager::PluginDescription>();
   if (!description->ParseFromDescriptionFile(plugin_description_file_path)) {
     return false;
   }
@@ -90,7 +89,7 @@ bool PluginManager::LoadPlugin(
 }
 
 /**
- * @brief find cyber_plugin_index directory
+ * @brief find sm_plugin_index directory
  * @param base_path search root
  * @param path_list vector for storing result
  * @return true if at least one is found
@@ -98,19 +97,19 @@ bool PluginManager::LoadPlugin(
 bool FindPlunginIndexPath(const std::string& base_path,
                           std::vector<std::string>* path_list) {
   // TODO(liangjinping): change to configurable
-  size_t count = apollo::cyber::common::FindPathByPattern(
-      base_path, "cyber_plugin_index", DT_DIR, true, path_list);
+  size_t count = sm::common::FindPathByPattern(
+      base_path, "sm_plugin_index", DT_DIR, true, path_list);
   return count > 0;
 }
 
 bool PluginManager::FindPluginIndexAndLoad(
     const std::string& plugin_index_path) {
   std::vector<std::string> plugin_index_list;
-  apollo::cyber::common::FindPathByPattern(plugin_index_path, "", DT_REG, false,
+  sm::common::FindPathByPattern(plugin_index_path, "", DT_REG, false,
                                            &plugin_index_list);
   bool success = true;
   for (auto plugin_index : plugin_index_list) {
-    std::string plugin_name = apollo::cyber::common::GetFileName(plugin_index);
+    std::string plugin_name = sm::common::GetFileName(plugin_index);
     AINFO << "plugin index[" << plugin_index << "] name[" << plugin_name
           << "] found";
     if (plugin_description_map_.find(plugin_name) !=
@@ -146,49 +145,22 @@ bool PluginManager::FindPluginIndexAndLoad(
 }
 
 bool PluginManager::LoadInstalledPlugins() {
-  if (apollo::cyber::common::GetEnv("APOLLO_PLUGIN_SEARCH_IN_BAZEL_OUTPUT") ==
-      "1") {
-    AWARN << "search plugin index path under bazel-bin enabled, it may take "
+  if (!sm::common::GetEnv("SM_ROOT_PATH").empty()) {
+    AWARN << "search plugin index path under SM_ROOT_PATH enabled, it may take "
              "longer time to load plugins";
-    // enable scanning cyber_plugin_index path under bazel-bin
-    const std::string apollo_root =
-        apollo::cyber::common::GetEnv("APOLLO_ROOT_DIR");
+    // enable scanning sm_plugin_index path under SM_ROOT_PATH
+    const std::string sm_root_path =
+        sm::common::GetEnv("SM_ROOT_PATH");
     // TODO(infra): make it configurable or detect automatically
-    const std::string bazel_bin_path = apollo_root + "/bazel-bin";
     std::vector<std::string> user_plugin_index_path_list;
-    AINFO << "scanning plugin index path under " << bazel_bin_path;
-    FindPlunginIndexPath(bazel_bin_path, &user_plugin_index_path_list);
+    AINFO << "scanning plugin index path under " << sm_root_path;
+    FindPlunginIndexPath(sm_root_path, &user_plugin_index_path_list);
     // load user plugin with higher priority
     for (auto dir : user_plugin_index_path_list) {
       AINFO << "loading user plugins from path[" << dir << "]";
       FindPluginIndexAndLoad(dir);
     }
   }
-
-  std::string plugin_index_path =
-      apollo::cyber::common::GetEnv("APOLLO_PLUGIN_INDEX_PATH");
-  if (plugin_index_path.empty()) {
-    // env not set, use default
-    const std::string apollo_distribution_home =
-        apollo::cyber::common::GetEnv("APOLLO_DISTRIBUTION_HOME");
-    const std::string plugin_index_path =
-        apollo_distribution_home + "/share/cyber_plugin_index";
-  }
-  AINFO << "loading plugins from APOLLO_PLUGIN_INDEX_PATH[" << plugin_index_path
-        << "]";
-  size_t begin = 0;
-  size_t index;
-  do {
-    index = plugin_index_path.find(':', begin);
-    auto p = plugin_index_path.substr(begin, index - begin);
-    if (apollo::cyber::common::DirectoryExists(p)) {
-      AINFO << "loading plugins from plugin index path[" << p << "]";
-      FindPluginIndexAndLoad(p);
-    } else {
-      AWARN << "plugin index path[" << p << "] not exists";
-    }
-    begin = index + 1;
-  } while (index != std::string::npos);
   return true;
 }
 
@@ -205,5 +177,4 @@ PluginManager* PluginManager::Instance() { return instance_; }
 PluginManager* PluginManager::instance_ = new PluginManager;
 
 }  // namespace plugin_manager
-}  // namespace cyber
-}  // namespace apollo
+}  // namespace sm
