@@ -8,8 +8,9 @@
 
 #include "common/log.h"
 #include "configuration/configuration.h"
-#include "state_manager/state_manager.h"
+#include "state_manager/state_manager_impl.h"
 #include "plugin_manager/plugin_manager.h"
+#include "sm/plugin/sm_plugin_interface.h"
 
 std::mutex g_app_mutex;
 std::condition_variable g_app_cv;
@@ -39,8 +40,18 @@ int main(int argc, char const *argv[]) {
   // Initialize plugin manager
   sm::plugin_manager::PluginManager::Instance()->LoadInstalledPlugins();
 
-  // Initialize state manager
-  sm::state_manager::StateManager::Instance();
+  // Initialize state manager impl
+  sm::state_manager::StateManagerImpl::Instance();
+
+  // Test plugin running func
+  auto sp = sm::plugin_manager::PluginManager::Instance()->
+    CreateInstance<SmPluginInterface>("OtaPlugin");
+  sp->Running();
+  auto sp1 = sm::plugin_manager::PluginManager::Instance()->
+    CreateInstance<SmPluginInterface>("CalibrationPlugin");
+  sp1->Running();
+
+  // Running
   AINFO << "Starting state manager app ...";
   std::unique_lock<std::mutex> lock(g_app_mutex);
   g_app_cv.wait(lock);
@@ -48,7 +59,7 @@ int main(int argc, char const *argv[]) {
 
 
   // Shutdown state manager app
-  sm::state_manager::StateManager::Instance()->CleanUp();
+  sm::state_manager::StateManagerImpl::Instance()->CleanUp();
   sm::plugin_manager::PluginManager::Instance()->CleanUp();
   sm::config::Configuration::Instance()->CleanUp();
   AINFO << "Shutting down state manager app...";

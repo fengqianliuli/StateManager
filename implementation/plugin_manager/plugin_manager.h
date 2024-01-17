@@ -260,8 +260,10 @@ std::vector<std::string> PluginManager::GetDerivedClassNameByBaseClass() {
   return derived_class_name;
 }
 
-#define SM_PLUGIN_MANAGER_REGISTER_PLUGIN(name, base) \
+/**
+ * #define SM_PLUGIN_MANAGER_REGISTER_PLUGIN(name, base) \
   CLASS_LOADER_REGISTER_CLASS(name, base)
+ */
 
 }  // namespace plugin_manager
 }  // namespace sm

@@ -1,0 +1,13 @@
+{
+    "path": "sm_plugin_lib/libexample_plugin.so",
+    "class": [
+        {
+            "type": "OtaPlugin",
+            "base_class": "SmPluginInterface"
+        },
+        {
+            "type": "CalibrationPlugin",
+            "base_class": "SmPluginInterface"
+        }
+    ]
+}
