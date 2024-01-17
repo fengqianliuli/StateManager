@@ -36,6 +36,8 @@
 namespace sm {
 namespace plugin_manager {
 
+PluginManager::PluginManager() {}
+
 PluginManager::~PluginManager() {}
 
 bool PluginManager::ProcessPluginDescriptionFile(const std::string& file_path,
@@ -127,6 +129,7 @@ bool PluginManager::FindPluginIndexAndLoad(
       continue;
     }
 
+    // load now
     // if (!class_loader_manager_.LoadLibrary(actual_library_path)) {
     //   success = false;
     //   AWARN << "plugin index[" << plugin_index << "] name[" << plugin_name
@@ -134,6 +137,7 @@ bool PluginManager::FindPluginIndexAndLoad(
     //         invalid";
     //   continue;
     // }
+
     // lazy load
     plugin_loaded_map_[description->name_] = false;
     plugin_description_map_[description->name_] = description;
@@ -148,7 +152,7 @@ bool PluginManager::FindPluginIndexAndLoad(
 
 bool PluginManager::LoadInstalledPlugins() {
   if (!sm::common::GetEnv("SM_ROOT_PATH").empty()) {
-    AWARN << "search plugin index path under SM_ROOT_PATH enabled, it may take "
+    AWARN << "search plugin index path under SM_ROOT_PATH, it may take "
              "longer time to load plugins";
     // enable scanning sm_plugin_index path under SM_ROOT_PATH
     const std::string sm_root_path =
@@ -173,10 +177,6 @@ bool PluginManager::LoadLibrary(const std::string& library_path) {
   }
   return true;
 }
-
-PluginManager* PluginManager::Instance() { return instance_; }
-
-PluginManager* PluginManager::instance_ = new PluginManager;
 
 }  // namespace plugin_manager
 }  // namespace sm

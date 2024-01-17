@@ -36,7 +36,7 @@ inline std::string GetEnv(const std::string& var_name,
 }
 
 inline const std::string WorkRoot() {
-  std::string work_root = GetEnv("SM_PATH");
+  std::string work_root = GetEnv("SM_ROOT_PATH");
   if (work_root.empty()) {
     work_root = "/state_manager";
   }

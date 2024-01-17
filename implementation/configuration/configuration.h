@@ -28,7 +28,7 @@ DECLARE_SINGLETON(Configuration);
 
  public:
   ~Configuration() = default;
-  bool Init(const std::string& path);
+  bool Init(int argc, char const *argv[]);
   bool IsInitialized() const { return init_; }
   const StateConfig &GetStateConfig() const {
     return state_config_;

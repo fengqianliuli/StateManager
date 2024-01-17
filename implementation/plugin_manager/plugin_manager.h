@@ -34,6 +34,7 @@ namespace sm {
 namespace plugin_manager {
 
 class PluginManager {
+DECLARE_SINGLETON(PluginManager);
  public:
   ~PluginManager();
 
@@ -54,13 +55,6 @@ class PluginManager {
    * @return result of loadding plugin, true for success
    */
   bool LoadPlugin(const std::string& plugin_description_file_path);
-
-  /**
-   * @brief get singleton instance of PluginManager
-   *
-   * @return instance pointer
-   */
-  static PluginManager* Instance();
 
   /**
    * @brief create plugin instance of derived class based on `Base`
@@ -141,8 +135,6 @@ class PluginManager {
   std::map<std::string, bool> plugin_loaded_map_;
   std::map<std::pair<std::string, std::string>, std::string>
       plugin_class_plugin_name_map_;
-
-  static PluginManager* instance_;
 };
 
 template <typename Base>

@@ -52,11 +52,15 @@ bool PluginDescription::ParseFromIndexFile(const std::string& file_path) {
   this->description_index_path_ = file_path;
   this->name_ = sm::common::GetFileName(file_path);
 
-  if (!sm::common::GetContent(file_path, &this->description_path_)) {
+  std::ifstream file(file_path, std::ios::in);
+  nlohmann::json root = nlohmann::json::parse(file, nullptr, true, true);
+  file.close();
+  if (root.is_discarded()) {
     AWARN << "plugin index[" << file_path << "] name[" << this->name_
           << "] invalid, read index file failed";
     return false;
   }
+  this->description_path_ = root["plugin_description_path"];
   return ParseFromDescriptionFile(this->description_path_);
 }
 
@@ -66,7 +70,7 @@ bool PluginDescription::ParseFromDescriptionFile(const std::string& file_path) {
   }
 
   if (!sm::common::GetFilePathWithEnv(
-          this->description_path_, "SM_PLUGIN_DESCRIPTION_PATH",
+          this->description_path_, "SM_ROOT_PATH",
           &this->actual_description_path_)) {
     AWARN << "plugin index[" << file_path << "] name[" << this->name_
           << "] invalid, description[" << this->description_path_
@@ -114,7 +118,7 @@ bool PluginDescription::ParseFromDescriptionFile(const std::string& file_path) {
   }
 
   if (!sm::common::GetFilePathWithEnv(this->library_path_,
-                                                 "SM_PLUGIN_LIB_PATH",
+                                                 "SM_ROOT_PATH",
                                                  &this->actual_library_path_)) {
     AWARN << "plugin description[" << file_path << "] name[" << this->name_
           << "] invalid, library[" << this->library_path_ << "] file not found";
