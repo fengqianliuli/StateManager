@@ -43,13 +43,13 @@ int main(int argc, char const *argv[]) {
   // Initialize state manager impl
   sm::state_manager::StateManagerImpl::Instance();
 
-  // Test plugin running func
-  auto sp = sm::plugin_manager::PluginManager::Instance()->
-    CreateInstance<SmPluginInterface>("OtaPlugin");
-  sp->Running();
-  auto sp1 = sm::plugin_manager::PluginManager::Instance()->
-    CreateInstance<SmPluginInterface>("CalibrationPlugin");
-  sp1->Running();
+  // Create all instance by base and start running plugin
+  auto plugin_obj_map = sm::plugin_manager::PluginManager::Instance()->
+    CreateAllInstanceByBase<SmPluginInterface>();
+  for (auto&& el : plugin_obj_map) {
+    AINFO << "Run plugin: " << el.first;
+    el.second->Run();
+  }
 
   // Running
   AINFO << "Starting state manager app ...";
@@ -57,6 +57,8 @@ int main(int argc, char const *argv[]) {
   g_app_cv.wait(lock);
 
 
+  // destory plugin obj
+  plugin_obj_map.clear();
 
   // Shutdown state manager app
   sm::state_manager::StateManagerImpl::Instance()->CleanUp();

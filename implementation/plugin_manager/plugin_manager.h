@@ -66,6 +66,15 @@ DECLARE_SINGLETON(PluginManager);
   std::shared_ptr<Base> CreateInstance(const std::string& derived_class);
 
   /**
+   * @brief create all plugin instance of derived class by same 'Base'
+   *
+   * @tparam Base
+   * @return map of all instance pointer
+   */
+  template <typename Base>
+  std::map<std::string, std::shared_ptr<Base>> CreateAllInstanceByBase();
+
+  /**
    * @brief find plugin index file and load plugins
    *
    * @param plugin_index_path plugin index file directory
@@ -146,6 +155,21 @@ std::shared_ptr<Base> PluginManager::CreateInstance(
     return nullptr;
   }
   return class_loader_manager_.CreateClassObj<Base>(derived_class);
+}
+
+template <typename Base>
+std::map<std::string, std::shared_ptr<Base>>
+PluginManager::CreateAllInstanceByBase() {
+  int status = 0;
+  std::string base_class_name =
+      abi::__cxa_demangle(typeid(Base).name(), 0, 0, &status);
+  std::map<std::string, std::shared_ptr<Base>> result;
+  for (auto&& el : plugin_class_plugin_name_map_) {
+    if (el.first.second == base_class_name) {
+      result[el.first.first] = CreateInstance<Base>(el.first.first);
+    }
+  }
+  return result;
 }
 
 template <typename Base>
