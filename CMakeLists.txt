@@ -23,6 +23,8 @@ set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/third_party")
 find_package(glog REQUIRED)
 find_package(nlohmann_json REQUIRED)
 # find_package(vsomeip3 REQUIRED)
+find_package(fastcdr REQUIRED)
+find_package(fastrtps REQUIRED)
 
 add_subdirectory(implementation)
 

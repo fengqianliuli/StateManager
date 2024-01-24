@@ -3,32 +3,37 @@
 #include "common/macros.h"
 
 #include <string>
-#include <memory>
-#include <mutex>
 
-#include <vsomeip/vsomeip.hpp>
+#include "communication/fastdds_type/type.h"
 
 namespace sm {
 namespace communication {
 namespace server {
 
-class ServerImpl {
+class ServerImpl : public DataReaderListener {
 DECLARE_SINGLETON(ServerImpl);
 
  public:
-  ~ServerImpl() = default;
+  virtual ~ServerImpl();
   bool Init();
-  void Start();
-  void Stop();
+  void Publish(Message& message);
 
  private:
-  void on_state(vsomeip::state_type_e _state);
-  void on_message(const std::shared_ptr<vsomeip::message> &_request);
+  void on_data_available(DataReader* reader) override;
+  void msg_handler();
 
  private:
-  std::shared_ptr<vsomeip::runtime> runtime_;
-  std::shared_ptr<vsomeip::application> app_;
-  std::mutex mutex_;
+  DomainParticipant* participant_{nullptr};
+  Publisher* publisher_{nullptr};
+  Subscriber* subscriber_{nullptr};
+  Topic* topic_{nullptr};
+  DataWriter* writer_{nullptr};
+  DataReader* reader_{nullptr};
+  TypeSupport type_;
+  Message message_;
+  SampleInfo info_;
+
+  GUID_t local_writer_guid_;
 };
 
 }  // namespace server

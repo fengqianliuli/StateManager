@@ -1,3 +1,7 @@
+file(GLOB fastdds_gen_SRC
+    "fastdds_type/*.cxx"
+)
+list(SORT fastdds_gen_SRC)
 ################################################################################
 # Communication Server Library
 ################################################################################
@@ -6,10 +10,10 @@ file(GLOB server_SRC
 )
 list(SORT server_SRC)
 
-add_library(server SHARED ${server_SRC})
+add_library(server SHARED ${server_SRC} ${fastdds_gen_SRC})
 set_target_properties (server PROPERTIES VERSION ${SM_VERSION} SOVERSION ${SM_MAJOR_VERSION})
 
-target_link_libraries(server common_header vsomeip3)
+target_link_libraries(server common_header fastrtps fastcdr)
 install(TARGETS server LIBRARY DESTINATION lib)
 
 

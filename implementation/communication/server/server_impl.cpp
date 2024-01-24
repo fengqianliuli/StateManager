@@ -1,63 +1,110 @@
 #include "communication/server/server_impl.h"
 
 #include "common/log.h"
-#include "communication/common_def.h"
 
 namespace sm {
 namespace communication {
 namespace server {
 
 ServerImpl::ServerImpl()
-    : runtime_(vsomeip::runtime::get()),
-      app_(runtime_->create_application("StateManager")) {
+    : type_(new MessagePubSubType()) {
 
+}
+
+ServerImpl::~ServerImpl() {
+  if (writer_ != nullptr) {
+    publisher_->delete_datawriter(writer_);
+  }
+  if (reader_ != nullptr) {
+    subscriber_->delete_datareader(reader_);
+  }
+  if (publisher_ != nullptr) {
+    participant_->delete_publisher(publisher_);
+  }
+  if (subscriber_ != nullptr) {
+    participant_->delete_subscriber(subscriber_);
+  }
+  if (topic_ != nullptr) {
+    participant_->delete_topic(topic_);
+  }
+  DomainParticipantFactory::get_instance()->delete_participant(participant_);
 }
 
 bool ServerImpl::Init() {
-  // init vsomeip app and register
-  std::lock_guard<std::mutex> its_lock(mutex_);
-
-  if (!app_->init()) {
-    AERROR << "failed to initialize vsomeip application.";
+  // init participant_
+  DomainParticipantQos participantQos;
+  participantQos.name("sm_server");
+  participant_ = DomainParticipantFactory::get_instance()->create_participant(0, participantQos);
+  if (participant_ == nullptr) {
+    AERROR << "create participant failed!";
     return false;
   }
-  app_->register_state_handler(
-    std::bind(&ServerImpl::on_state, this, std::placeholders::_1));
-  app_->register_message_handler(
-    kSmServiceId, vsomeip::ANY_INSTANCE, kSmMethodId,
-    std::bind(&ServerImpl::on_message, this, std::placeholders::_1)
-  );
+
+  // Register the Type
+  type_.register_type(participant_);
+  // Create the publications Topic
+  topic_ = participant_->create_topic(kTopicName, kTypeName, TOPIC_QOS_DEFAULT);
+  if (topic_ == nullptr) {
+    AERROR << "create topic failed!";
+    return false;
+  }
+
+  // Create the Publisher
+  publisher_ = participant_->create_publisher(PUBLISHER_QOS_DEFAULT, nullptr);
+  if (publisher_ == nullptr) {
+    AERROR << "create publisher failed!";
+    return false;
+  }
+
+  // Create the DataWriter
+  writer_ = publisher_->create_datawriter(topic_, DATAWRITER_QOS_DEFAULT);
+  local_writer_guid_ = writer_->guid();
+  if (writer_ == nullptr) {
+    AERROR << "create data_writer failed!";
+    return false;
+  }
+
+  // Create the Subscriber
+  subscriber_ = participant_->create_subscriber(SUBSCRIBER_QOS_DEFAULT, nullptr);
+  if (subscriber_ == nullptr) {
+    AERROR << "create subscriber failed!";
+    return false;
+  }
+
+  // Create the DataReader
+  reader_ = subscriber_->create_datareader(topic_, DATAREADER_QOS_DEFAULT, this);
+  if (reader_ == nullptr) {
+    AERROR << "create data_reader failed!";
+    return false;
+  }
+
   return true;
 }
 
-void ServerImpl::Start() {
-  app_->start();
-}
-
-void ServerImpl::Stop() {
-  app_->clear_all_handler();
-  app_->stop_offer_service(kSmServiceId, vsomeip::ANY_INSTANCE);
-  app_->stop();
-}
-
-void ServerImpl::on_state(vsomeip::state_type_e _state) {
-  AINFO << "application " << app_->get_name() << " is "
-        << (_state == vsomeip::state_type_e::ST_REGISTERED ?
-            "registered." : "deregistered.");
-  if (_state == vsomeip::state_type_e::ST_REGISTERED) {
-    app_->offer_service(kSmServiceId, vsomeip::ANY_INSTANCE);
+void ServerImpl::Publish(Message& message) {
+  if (writer_ != nullptr) {
+    writer_->write(&message);
   }
 }
 
-void ServerImpl::on_message(const std::shared_ptr<vsomeip::message>& _request) {
-  AINFO << "Received a message: "
-        << "client: " << _request->get_client() << "."
-        << "session: " << _request->get_session() << "."
-        << "service: " << _request->get_service() << "."
-        << "instance: " << _request->get_instance() << "."
-        << "method: " << _request->get_method() << ".";
+void ServerImpl::on_data_available(DataReader* reader) {
+  if (reader->take_next_sample(&message_, &info_) == ReturnCode_t::RETCODE_OK) {
+    if (info_.valid_data) {
+      if (local_writer_guid_ == info_.sample_identity.writer_guid()) {
+        AINFO << "ignore message from myself.";
+        return;
+      }
+      this->msg_handler();
+    }
+  }
 }
 
+void ServerImpl::msg_handler() {
+  AINFO <<
+    "Received message: id[" << message_.id() << "]"
+    " msg_type[" << message_.msg_type() << "]"
+    " content[" << message_.content() << "]";
+}
 
 }  // namespace server
 }  // namespace communication

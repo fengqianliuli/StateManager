@@ -1,0 +1,7 @@
+module sm
+{
+    struct Message
+    {
+        string content;
+    };
+};
